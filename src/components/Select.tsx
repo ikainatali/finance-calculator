@@ -9,6 +9,8 @@ const InputSelect = () => {
   const [inputValue, setInputValue] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [tagValue, setTagValue] = useState([]);
+  const [operator, setOperator] = useState("");
+  const [tagOperatorValidation, setTagOperatorValidation] = useState([]);
 
   useEffect(() => {
     const apiData = async () => {
@@ -29,19 +31,29 @@ const InputSelect = () => {
 
     //suggestion on input
     let matches: object[] = [];
-    const regexString = new RegExp(`${iValue}`, "i");
-    const regexOperator = /[+\-*\/%()^]/;
-    let operator: any;
+
+    const arthematicOperator: any = /[+\-*\/%^()]/;
+
+    let expression;
+
     if (iValue.length > 0) {
-      operator = regexOperator.test(iValue);
+      expression = arthematicOperator.test(iValue);
+      console.log("exp", expression);
+      if (expression) {
+        setTagOperatorValidation([
+          ...tagOperatorValidation,
+          { name: tagValue.name, value: tagValue.value, operator: iValue },
+        ]);
+        console.log("operator matches");
+      } else {
+        console.log("operator does not match");
+      }
+
       matches = dummyData.filter(({ name }) => {
-        if (operator) {
-          console.log("operator matched");
-        } else {
-          return regexString.test(name);
-        }
+        return name.includes(iValue);
       });
     }
+    console.log("operator", operator);
     setSuggestions(matches as any);
   };
 
@@ -71,7 +83,8 @@ const InputSelect = () => {
     // console.log(e);
   };
 
-  console.log("complete form data", tagValue);
+  console.log("complete data", tagValue);
+  console.log("complete form data", tagOperatorValidation);
   return (
     <>
       <div className="relative flex flex-wrap justify-center items-center gap-3 w-full pt-20">
